@@ -183,18 +183,7 @@ const updateEvents = async (req, res, next) => {
       result.tagline = tagline;
       result.category = category;
       result.user = user;
-      // result = new Event({
-      //   title,
-      //   price,
-      //   date,
-      //   about,
-      //   venueName,
-      //   tagline,
-      //   keyPoint: JSON.parse(keyPoint),
-      //   category,
-      //   speaker,
-      //   user,
-      // });
+      result.keyPoint = JSON.parse(keyPoint);
     } else {
       let currentImage = `${config.rootPath}/public/uploads/${result.cover}`;
 
@@ -209,20 +198,8 @@ const updateEvents = async (req, res, next) => {
       result.tagline = tagline;
       result.category = category;
       result.user = user;
+      result.keyPoint = JSON.parse(keyPoint);
       result.cover = req.file.filename;
-      // result = new Event({
-      //   title,
-      //   price,
-      //   date,
-      //   cover: req.file.filename,
-      //   about,
-      //   venueName,
-      //   tagline,
-      //   keyPoint: JSON.parse(keyPoint),
-      //   category,
-      //   speaker,
-      //   user,
-      // });
     }
     await result.save();
     res.status(StatusCodes.CREATED).json({ data: result });
@@ -234,7 +211,7 @@ const updateEvents = async (req, res, next) => {
 const deleteEvents = async (req,res,next) =>{
   try {
       const {id: eventId} = req.params;
-      result = await Event.findOne({_id : eventId, user : req.user.id});
+      let result = await Event.findOne({_id : eventId, user : req.user.id});
       
       if(!result){
           throw new CustomAPI.NotFoundError('No Event with id :' + eventId);
@@ -244,7 +221,7 @@ const deleteEvents = async (req,res,next) =>{
       if(fs.existsSync(currentImage)){
           fs.unlinkSync(currentImage);
       }
-      result.remove();
+      await result.remove();
       res.status(StatusCodes.OK).json({data : result})
   } catch (error) {
       next(error);
