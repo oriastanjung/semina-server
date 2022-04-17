@@ -45,7 +45,14 @@ const createSpeaker = async (req, res, next) => {
 const getOneSpeaker = async (req, res, next) => {
   try {
     const { id: speakerId } = req.params;
-    const result = await Speaker.findOne({ _id: speakerId, user: req.user.id });
+    const result = await Speaker.findOne({ _id: speakerId, user: req.user.id }).populate({
+      path: 'category',
+      select: '_id name',
+    })
+    .populate({
+      path: 'speaker',
+      select: { _id: 1, foto: '$avatar', avatar: 1, name: 1, role: 1 },
+    });;
 
     if (!result) {
       throw new CustomAPI.NotFoundError('No Speaker with id :' + speakerId);
